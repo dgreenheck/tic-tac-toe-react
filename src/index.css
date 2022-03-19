@@ -7,6 +7,15 @@ ol, ul {
   padding-left: 30px;
 }
 
+.button {
+  font: 12px;
+}
+
+.button-bold {
+  font: 12px;
+  font-weight: bold;
+}
+
 .board-row:after {
   clear: both;
   content: "";
@@ -23,6 +32,20 @@ ol, ul {
   float: left;
   font-size: 24px;
   font-weight: bold;
+  line-height: 34px;
+  height: 34px;
+  margin-right: -1px;
+  margin-top: -1px;
+  padding: 0;
+  text-align: center;
+  width: 34px;
+}
+
+.label {
+  display: inline;
+  float: left;
+  font-size: 18px;
+  font-weight: normal;
   line-height: 34px;
   height: 34px;
   margin-right: -1px;
