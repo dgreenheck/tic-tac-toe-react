@@ -1,57 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-
-function Square(props) {
-  return (
-    <button className="square" onClick={props.onClick}>
-      {props.value}
-    </button>
-  );
-}
-
-class Board extends React.Component {
-
-  renderSquare(i) {
-    return (
-      <Square 
-        value={this.props.squares[i]}
-        onClick={() => this.props.onClick(i)}
-      />
-    );
-  }
-
-  render() {
-    return (
-      <div>
-        <div className="board-row">
-        <span className="label"></span>
-          <span className="label">1</span>
-          <span className="label">2</span>
-          <span className="label">3</span>
-        </div>
-        <div className="board-row">
-          <span className="label">1</span>
-          {this.renderSquare(0)}
-          {this.renderSquare(1)}
-          {this.renderSquare(2)}
-        </div>
-        <div className="board-row">
-          <span className="label">2</span>
-          {this.renderSquare(3)}
-          {this.renderSquare(4)}
-          {this.renderSquare(5)}
-        </div>
-        <div className="board-row">
-          <span className="label">3</span>
-          {this.renderSquare(6)}
-          {this.renderSquare(7)}
-          {this.renderSquare(8)}
-        </div>
-      </div>
-    );
-  }
-}
+import Board from './Board.js';
 
 class Game extends React.Component {
 
@@ -60,10 +10,11 @@ class Game extends React.Component {
     this.state = {
       history: [{
         squares: Array(9).fill(null),
-        moveIndex: null,
+        squareIndex: null,
       }],
       xIsNext: true,
       currentStep: 0,
+      sortAscending: true,
     };
   }
 
@@ -79,10 +30,18 @@ class Game extends React.Component {
         </div>
         <div className="game-info">
           <div>{this.getStatus()}</div>
+          <button onClick={() => this.onSortClick()}>Sort: {this.state.sortAscending ? 'Ascending' : 'Descending'}</button>
           <ol>{this.getMoveHistory()}</ol>
         </div>
       </div>
     );
+  }
+
+  onSortClick() {
+    console.log('Sort button clicked');
+    this.setState({
+      sortAscending: !this.state.sortAscending,
+    });
   }
 
   // Get the current game status string
@@ -98,19 +57,27 @@ class Game extends React.Component {
 
   // Gets the interactive move list
   getMoveHistory() {
-    const current = this.state.history[this.state.currentStep];
-    return this.state.history.map((boardState, moveIndex) => {
+    var history = this.state.history.slice()
+
+    if (!this.state.sortAscending) {
+      history.reverse();
+    }
+
+    return history.map((boardState, i) => {
+      const moveNumber = this.state.sortAscending ? i : (history.length - i - 1);
+
       // Row and column of the move
-      const row = Math.floor(current.moveIndex / 3) + 1;
-      const col = (current.moveIndex % 3) + 1;
-      const desc = moveIndex ?
-        'Move #' + moveIndex + ' (' + row + ',' + col + ')' :
-        'Game Start';
+      const row = Math.floor(boardState.squareIndex / 3) + 1;
+      const col = (boardState.squareIndex % 3) + 1;
+      const desc = (boardState.squareIndex == null) ?
+        'Game Start' :
+        'Move #' + moveNumber + ' (' + row + ',' + col + ')';
+
       return (
-        <li key={moveIndex}>
+        <li key={boardState.squareIndex}>
           <button 
-            className={moveIndex == this.state.currentStep ? 'button-bold' : 'button'}
-            onClick={() => this.jumpTo(moveIndex)}>{desc}
+            className={i === this.state.currentStep ? 'button-bold' : 'button'}
+            onClick={() => this.jumpTo(i)}>{desc}
           </button>
         </li>
       )
@@ -121,7 +88,7 @@ class Game extends React.Component {
   jumpTo(step) {
     this.setState({
       currentStep: step,
-      xIsNext: (step % 2 == 0),
+      xIsNext: (step % 2 === 0),
     });
   }
 
@@ -145,7 +112,7 @@ class Game extends React.Component {
     this.setState({
       history: history.concat([{
         squares: squares,
-        moveIndex: i,
+        squareIndex: i,
       }]),
       xIsNext: !this.state.xIsNext,
       currentStep: this.state.currentStep + 1,
