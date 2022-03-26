@@ -5,7 +5,10 @@ const HEADER = -1;
 
 function Square(props) {
   return (
-    <button className="square" onClick={props.onClick}>
+    <button
+      className={props.highlighted ? "highlighted_square" : "square"}
+      onClick={props.onClick}
+    >
       {props.value}
     </button>
   );
@@ -19,6 +22,7 @@ class Board extends React.Component {
         value={this.props.squares[i]}
         key={i}
         onClick={() => this.props.onClick(i)}
+        highlighted={this.props.highlightedSquares.includes(i)}
       />
     );
   }
